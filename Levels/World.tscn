@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://dtcdpdnfionxv"]
+
+[ext_resource type="Script" path="res://Levels/World.gd" id="1_wirw6"]
+[ext_resource type="Texture2D" uid="uid://e6c1l3vqjryy" path="res://Assets/TX Tileset Grass.png" id="2_04n1d"]
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_wirw6")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_04n1d")
+
+[node name="AllPlayers" type="Node2D" parent="."]
+
+[node name="AllObjects" type="Node2D" parent="."]
+
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://Player/Player.tscn")
+spawn_path = NodePath("../AllPlayers")
+
+[node name="ObjectSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://Projectiles/Fireball.tscn")
+spawn_path = NodePath("../AllObjects")

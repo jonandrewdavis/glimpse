@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://dxc5fjs64yve3"]
+
+[ext_resource type="Texture2D" uid="uid://l1651pbhatb7" path="res://icon.svg" id="1_7sxxj"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ul2ya"]
+radius = 4.12311
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_oi5yr"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
+[node name="Fireball" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(35.8676, -0.397298)
+rotation = 1.55334
+scale = Vector2(0.0726492, 0.244133)
+texture = ExtResource("1_7sxxj")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_ul2ya")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_oi5yr")
