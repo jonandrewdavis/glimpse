@@ -9,14 +9,10 @@ script = ExtResource("1_wirw6")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_04n1d")
 
-[node name="AllPlayers" type="Node2D" parent="."]
-
-[node name="AllObjects" type="Node2D" parent="."]
-
 [node name="PlayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("res://Player/Player.tscn")
-spawn_path = NodePath("../AllPlayers")
+spawn_path = NodePath("..")
 
 [node name="ObjectSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("res://Projectiles/Fireball.tscn")
-spawn_path = NodePath("../AllObjects")
+spawn_path = NodePath("..")
