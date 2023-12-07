@@ -2,3 +2,4 @@
 .godot/
 DEDICATED_SERVER_SECRET.txt
 *.tmp
+*.exe
