@@ -35,17 +35,21 @@ func _ready():
 	set_physics_process(get_multiplayer_authority() == multiplayer.get_unique_id())
 	if not is_multiplayer_authority():
 		return
-		
-	var newCamera = Camera2D.new()
-	newCamera.ignore_rotation = true
-	newCamera.limit_smoothed = true
-	add_child(newCamera)
 
+	ready_player_only_nodes()	
 	var rng = RandomNumberGenerator.new()
 	var rndX = int(rng.randi_range(int(PLAYER_START.x) - 50, int(PLAYER_START.x) + 50))
 	var rndY = int(rng.randi_range(int(PLAYER_START.y) - 50, int(PLAYER_START.y) + 50))
 	position = Vector2(rndX, rndY)
 	
+func ready_player_only_nodes():
+	var newUI = load("res://UI/UI.tscn").instantiate()
+	var newCamera = Camera2D.new()
+	newCamera.ignore_rotation = true
+	newCamera.limit_smoothed = true
+	add_child(newUI)
+	add_child(newCamera)
+
 	
 func _process(_delta):
 	mouse_direction = (get_global_mouse_position() - global_position).normalized()
@@ -54,7 +58,6 @@ func _process(_delta):
 		$Sample.flip_h = false
 	elif mouse_direction.x < 0 and not $Sample.flip_h:
 		$Sample.flip_h = true
-
 
 func _physics_process(delta):
 	if mov_direction != Vector2.ZERO:
@@ -71,7 +74,6 @@ func get_input():
 	mov_direction = mov_direction.normalized()
 	
 	if Input.is_action_just_released("f"):
-		print(Store.store.score)
 		create_object.rpc()
 
 	if Input.is_action_just_released("z"):
@@ -84,7 +86,6 @@ func create_object():
 		var fire = load("res://Projectiles/Fireball.tscn")
 		var fun = fire.instantiate()
 		fun.position = global_position
-		print('Create in:', get_multiplayer_authority())
 		get_parent().add_child(fun, true)
 
 # if is_on_wall() and FSM.current_state.name != 'PlayerMove':

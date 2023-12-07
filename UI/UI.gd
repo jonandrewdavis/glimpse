@@ -6,12 +6,17 @@ extends Node
 @export var score = 0
 @export var peer_list = []
 
+@onready var menu_ref = $CanvasLayer/SettingsMenu
+@onready var players_label = $CanvasLayer/SettingsMenu/Players
+@onready var score_label = $CanvasLayer/SettingsMenu/Label
+
 func _ready():
+	menu_ref.hide()
 	Store.e.connect(refresh)
 	pass
-	
+
 func refresh():
-	$Control/Label.text = str(Store.store.score)
+	score_label.text = str(Store.store.score)
 	var completePlayers = ""
 	for id in Store.store.players: 
 		var single = ""
@@ -19,6 +24,10 @@ func refresh():
 			single += str(Store.store.players[id][k]) + ', '
 
 		completePlayers += 'player: ' + single + '\n '
-	
-	$Control/Players.text = completePlayers
+	players_label.text = completePlayers
 	pass
+
+# TODO: this should be a player action?
+func _unhandled_input(_event):
+	if Input.is_action_just_pressed("esc") or Input.is_action_just_pressed("tab"):
+		menu_ref.visible = !menu_ref.visible
