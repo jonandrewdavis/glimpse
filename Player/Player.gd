@@ -74,19 +74,23 @@ func get_input():
 	mov_direction = mov_direction.normalized()
 	
 	if Input.is_action_just_released("f"):
-		create_object.rpc()
-
-	if Input.is_action_just_released("z"):
+		# Incrementing the score is just an example.
 		var newVal = Store.store.score + 1
 		Store.set_state.rpc('score', newVal)
+		# Because player input isn't synced and create happens on the server
+		# we need to pass in the mouse position of the player who casted it.
+		cast_fireball.rpc(get_global_mouse_position())
 
 @rpc("call_local", "reliable")
-func create_object():
+func cast_fireball(player_mouse_position):
 	if multiplayer.is_server():
-		var fire = load("res://Projectiles/Fireball.tscn")
-		var fun = fire.instantiate()
-		fun.position = global_position
-		get_parent().add_child(fun, true)
+		var fireball_scene = load("res://Projectiles/Fireball.tscn")
+		var fireball = fireball_scene.instantiate()
+		fireball.position = global_position
+		fireball.look_at(player_mouse_position)
+		fireball.direction = (player_mouse_position - global_position).normalized()
+		# I learned the hard way only the server should add things the MultiplayerSpawner will handle the rest.
+		get_parent().add_child(fireball, true)
 
 # if is_on_wall() and FSM.current_state.name != 'PlayerMove':
 	# velocity = velocity.move_toward(mov_direction * max_speed * 0.9, (acceleration * 1.05) * delta)

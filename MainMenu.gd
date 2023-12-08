@@ -5,10 +5,15 @@ var upnp_on = false
 var quick_quit_enabled = true
 
 @onready var world_ref = get_node('/root/Main/World')
+@onready var ip_ref = $Panel/VBoxContainer/IP
+@onready var nickname = $Panel/VBoxContainer/Nickname
+@onready var upnp_ref = $Panel/VBoxContainer/UPNP
+@onready var color_button = $Panel/VBoxContainer/ColorPickerButton
 
 func _ready():
 	prepare_server_or_client()
 	multiplayer.connection_failed.connect(_on_connected_fail)
+	multiplayer.server_disconnected.connect(_on_connected_fail)
 	pass
 
 func _unhandled_input(_event):
@@ -31,7 +36,7 @@ func prepare_server_or_client():
 	if args.size() == 0:
 		# OPTIONAL: Create a text file with this name, it won't be added to git.
 		# When you export, the server IP will be pre-filled for clients.
-		$IP.text = read_secret_ip("res://DEDICATED_SERVER_SECRET.txt")
+		ip_ref.text = read_secret_ip("res://DEDICATED_SERVER_SECRET.txt")
 
 func _on_host_pressed():
 	var peer = ENetMultiplayerPeer.new()	
@@ -43,7 +48,7 @@ func _on_host_pressed():
 	start_game()
 
 func _on_join_pressed():
-	var ip = $IP.text
+	var ip = ip_ref.text
 	var peer = ENetMultiplayerPeer.new()
 	var peer_client_status = peer.create_client(ip, PORT)
 	if peer_client_status == OK:
@@ -53,18 +58,17 @@ func _on_join_pressed():
 	else: 
 		_on_connected_fail()
 
-# This is a just in case. 
 func _on_connected_fail():
 	multiplayer.multiplayer_peer = null
-	$Error.show()
+	$Panel/VBoxContainer/Error.show()
 	show()
 
 func start_game():
 	# If we're a client, we just hide and send our join info.
 	hide()
 	Store.client_join_info = {
-		"nickname": $Nickname.text,
-		"color": $ColorPickerButton.color,
+		"nickname": nickname.text,
+		"color": color_button.color,
 		"id": multiplayer.get_unique_id(),
 	}
 	

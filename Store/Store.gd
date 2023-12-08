@@ -35,7 +35,6 @@ func on_player_join(_id):
 func set_state(key, value):
 	if multiplayer.is_server():
 		if key == 'client_join':
-
 			store.players[value.id] = value
 		if key == 'client_leave':
 			store.players.erase(value)

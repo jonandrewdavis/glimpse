@@ -1,14 +1,11 @@
 extends Node
 
-# Server is authorativie LIST of EVERYTHING. and we do nothing but link up the "text".
-# properties in the Syncronizer!
-
 @export var score = 0
 @export var peer_list = []
 
 @onready var menu_ref = $CanvasLayer/SettingsMenu
-@onready var players_label = $CanvasLayer/SettingsMenu/Players
-@onready var score_label = $CanvasLayer/SettingsMenu/Label
+@onready var players_label = $CanvasLayer/SettingsMenu/Panel/VBoxContainer/Players
+@onready var score_label = $CanvasLayer/SettingsMenu/Panel/VBoxContainer/Score
 
 func _ready():
 	menu_ref.hide()
@@ -22,12 +19,10 @@ func refresh():
 		var single = ""
 		for k in Store.store.players[id]:
 			single += str(Store.store.players[id][k]) + ', '
-
-		completePlayers += 'player: ' + single + '\n '
+		completePlayers += 'player: ' + single + '\n'
 	players_label.text = completePlayers
 	pass
 
-# TODO: this should be a player action?
 func _unhandled_input(_event):
 	if Input.is_action_just_pressed("esc") or Input.is_action_just_pressed("tab"):
 		menu_ref.visible = !menu_ref.visible
