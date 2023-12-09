@@ -4,8 +4,8 @@ extends Node
 @export var peer_list = []
 
 @onready var menu_ref = $CanvasLayer/SettingsMenu
-@onready var players_label = $CanvasLayer/SettingsMenu/Panel/VBoxContainer/Players
-@onready var score_label = $CanvasLayer/SettingsMenu/Panel/VBoxContainer/Score
+@onready var players_label = $CanvasLayer/SettingsMenu/Panel/MarginContainer/VBoxContainer/Players
+@onready var score_label = $CanvasLayer/SettingsMenu/Panel/MarginContainer/VBoxContainer/Score
 
 func _ready():
 	menu_ref.hide()
@@ -18,8 +18,8 @@ func refresh():
 	for id in Store.store.players: 
 		var single = ""
 		for k in Store.store.players[id]:
-			single += str(Store.store.players[id][k]) + ', '
-		completePlayers += 'player: ' + single + '\n'
+			single += k + ': ' + str(Store.store.players[id][k]) + ', '
+		completePlayers += single + '\n'
 	players_label.text = completePlayers
 	pass
 

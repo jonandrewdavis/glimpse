@@ -5,16 +5,17 @@ var upnp_on = false
 var quick_quit_enabled = true
 
 @onready var world_ref = get_node('/root/Main/World')
-@onready var ip_ref = $Panel/VBoxContainer/IP
-@onready var nickname = $Panel/VBoxContainer/Nickname
-@onready var upnp_ref = $Panel/VBoxContainer/UPNP
-@onready var color_button = $Panel/VBoxContainer/ColorPickerButton
+@onready var ip_ref = $Panel/MarginContainer/VBoxContainer/IP
+@onready var nickname = $Panel/MarginContainer/VBoxContainer/Nickname
+@onready var upnp_ref = $Panel/MarginContainer/VBoxContainer/UPNP
+@onready var color_button = $Panel/MarginContainer/VBoxContainer/ColorPickerButton
+@onready var error_ref = $Panel/MarginContainer/VBoxContainer/Error
 
 func _ready():
 	prepare_server_or_client()
+	prepare_color_picker()
 	multiplayer.connection_failed.connect(_on_connected_fail)
-	multiplayer.server_disconnected.connect(_on_connected_fail)
-	pass
+	multiplayer.server_disconnected.connect(_on_connected_fail)	
 
 func _unhandled_input(_event):
 	if (Input.is_action_just_pressed("esc") 
@@ -35,7 +36,8 @@ func prepare_server_or_client():
 	# If there are no CMD line args, we are a client.
 	if args.size() == 0:
 		# OPTIONAL: Create a text file with this name, it won't be added to git.
-		# When you export, the server IP will be pre-filled for clients.
+		# When you export, the server IP will be pre-filled for clients.  
+		# Try not to expose this IP, as I think bad actors could take advantage of open ports
 		ip_ref.text = read_secret_ip("res://DEDICATED_SERVER_SECRET.txt")
 
 func _on_host_pressed():
@@ -60,16 +62,16 @@ func _on_join_pressed():
 
 func _on_connected_fail():
 	multiplayer.multiplayer_peer = null
-	$Panel/VBoxContainer/Error.show()
+	error_ref.show()
 	show()
 
 func start_game():
 	# If we're a client, we just hide and send our join info.
 	hide()
 	Store.client_join_info = {
+		"id": multiplayer.get_unique_id(),
 		"nickname": nickname.text,
 		"color": color_button.color,
-		"id": multiplayer.get_unique_id(),
 	}
 	
 	if multiplayer.is_server():
@@ -82,12 +84,12 @@ func change_level(scene: PackedScene):
 	
 	# Add the chosen level to the world
 	world_ref.add_child(scene.instantiate())
-	# Add the players to the world
-	prepare_server_world()
+	# Connect the scripts required to listen for player events.
+	ready_server_world()
 
 func _on_upnp_toggled(toggled_on):
 	upnp_on = toggled_on
-	
+
 func upnp_setup():
 	var upnp = UPNP.new()
 	
@@ -112,8 +114,7 @@ func read_secret_ip(path):
 	else:
 		return ''
 
-# TODO: These functions are named 
-func prepare_server_world():
+func ready_server_world():
 	# Welcome players
 	# Only the server listens for events of peers connecting or disconnecting:
 	if multiplayer.is_server():
@@ -126,7 +127,6 @@ func prepare_server_world():
 		if Store.is_headless_mode == false:
 			add_player_in_server(1)
 
-# TODO: should be add_player in "world"? instead?
 func add_player_in_server(id: int):
 	var character_scene = preload("res://Player/Player.tscn")
 	var character =  character_scene.instantiate()
@@ -138,8 +138,14 @@ func delete_player_in_server(id: int):
 	if world_ref.get_node(string_id).is_in_group('players'):
 		world_ref.get_node(string_id).queue_free()
 		Store.set_state.rpc('client_leave', id)
-	
+
 func _exit_tree():
 	if multiplayer.is_server():
 		multiplayer.peer_connected.disconnect(add_player_in_server)
 		multiplayer.peer_disconnected.disconnect(delete_player_in_server)
+
+func prepare_color_picker():
+	var props = ['presets_visible', 'sampler_visible', 'sliders_visible', 'color_modes_visible']
+	var picker = color_button.get_picker()
+	for p in props:
+		picker[p] = false

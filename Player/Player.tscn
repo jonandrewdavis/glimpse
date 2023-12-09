@@ -7,6 +7,12 @@
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
 properties/0/replication_mode = 1
+properties/1/path = NodePath("Sample:modulate")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath("Nickname:text")
+properties/2/spawn = true
+properties/2/replication_mode = 2
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_c5xbu"]
 radius = 6.0
@@ -24,3 +30,11 @@ shape = SubResource("CircleShape2D_c5xbu")
 texture = ExtResource("2_8vw4a")
 region_enabled = true
 region_rect = Rect2(7, 4, 16, 28)
+
+[node name="Nickname" type="Label" parent="."]
+offset_left = -100.0
+offset_top = -35.0
+offset_right = 100.0
+offset_bottom = -15.0
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1

@@ -16,7 +16,7 @@ const CONST_STARTING_SPEED = 130; # increase for top speed
 const CONST_ACCELERATION = 220 # decrease to cause more startup time
 const CONST_FRICTION = 280
 
-@export var friction: int = 250 # decrease to cause sliding
+@export var friction: int = 250 # decrease to cause more sliding
 @export var acceleration = CONST_ACCELERATION
 @export var max_speed = CONST_STARTING_SPEED
 
@@ -30,26 +30,30 @@ func _enter_tree():
 	set_multiplayer_authority(str(name).to_int())
 
 func _ready():
-	add_to_group("players") # lowercase or upper. I like lower.
+	add_to_group("players") # lowercase or upper? I like lower for now.
 	set_process(get_multiplayer_authority() == multiplayer.get_unique_id())
 	set_physics_process(get_multiplayer_authority() == multiplayer.get_unique_id())
+	
+	# Below this, we're executing only on the server.
 	if not is_multiplayer_authority():
 		return
 
-	ready_player_only_nodes()	
+	ready_client_only_nodes()
 	var rng = RandomNumberGenerator.new()
 	var rndX = int(rng.randi_range(int(PLAYER_START.x) - 50, int(PLAYER_START.x) + 50))
 	var rndY = int(rng.randi_range(int(PLAYER_START.y) - 50, int(PLAYER_START.y) + 50))
 	position = Vector2(rndX, rndY)
-	
-func ready_player_only_nodes():
+
+func ready_client_only_nodes():
+	$Sample.modulate = 	Store.client_join_info.color.lightened(0.2)
+	$Nickname.text = Store.client_join_info.nickname
 	var newUI = load("res://UI/UI.tscn").instantiate()
 	var newCamera = Camera2D.new()
 	newCamera.ignore_rotation = true
 	newCamera.limit_smoothed = true
 	add_child(newUI)
 	add_child(newCamera)
-
+	
 	
 func _process(_delta):
 	mouse_direction = (get_global_mouse_position() - global_position).normalized()
@@ -65,6 +69,10 @@ func _physics_process(delta):
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 
+	# NOTE: Uncomment and adjust if collisions with walls are "sticky" in 2D.
+	# if is_on_wall() and FSM.current_state.name != 'PlayerMove':
+		# velocity = velocity.move_toward(mov_direction * max_speed * 0.9, (acceleration * 1.05) * delta)
+
 	move_and_slide()
 
 func get_input():
@@ -77,7 +85,7 @@ func get_input():
 		# Incrementing the score is just an example.
 		var newVal = Store.store.score + 1
 		Store.set_state.rpc('score', newVal)
-		# Because player input isn't synced and create happens on the server
+		# Because player input isn't synced and spawn happens on the server
 		# we need to pass in the mouse position of the player who casted it.
 		cast_fireball.rpc(get_global_mouse_position())
 
@@ -91,6 +99,3 @@ func cast_fireball(player_mouse_position):
 		fireball.direction = (player_mouse_position - global_position).normalized()
 		# I learned the hard way only the server should add things the MultiplayerSpawner will handle the rest.
 		get_parent().add_child(fireball, true)
-
-# if is_on_wall() and FSM.current_state.name != 'PlayerMove':
-	# velocity = velocity.move_toward(mov_direction * max_speed * 0.9, (acceleration * 1.05) * delta)
