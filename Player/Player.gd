@@ -81,7 +81,7 @@ func get_input():
 	mov_direction.y = Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
 	mov_direction = mov_direction.normalized()
 	
-	if Input.is_action_just_released("f"):
+	if Input.is_action_just_pressed("f") or Input.is_action_just_pressed("click"):
 		# Incrementing the score is just an example.
 		var newVal = Store.store.score + 1
 		Store.set_state.rpc('score', newVal)

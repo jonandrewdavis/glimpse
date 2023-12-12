@@ -105,6 +105,7 @@ func upnp_setup():
 		"UPNP Port Mapping Failed! Error %s" % map_result)
 	
 	print("Success! Join Address: %s" % upnp.query_external_address())
+	Store.upnp_host_ip = str(upnp.query_external_address())
 
 func read_secret_ip(path):
 	var file = FileAccess.open(path, FileAccess.READ)
@@ -117,6 +118,7 @@ func read_secret_ip(path):
 func ready_server_world():
 	# Welcome players
 	# Only the server listens for events of peers connecting or disconnecting:
+	# NOTE: A player will update state on joining so that everyone has their new info!
 	if multiplayer.is_server():
 		multiplayer.peer_connected.connect(add_player_in_server)
 		multiplayer.peer_disconnected.connect(delete_player_in_server)
